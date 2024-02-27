@@ -1,0 +1,3 @@
+interface IEditUserDTO {}
+
+export { IEditUserDTO };

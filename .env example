@@ -1,0 +1,21 @@
+#############################################
+################## Commons ##################
+#############################################
+# Production
+PROD
+# Email
+EMAIL_USER
+EMAIL_PASS
+EMAIL_FROM
+# DATABASE
+DB_URL
+# URL
+URL_ROOT
+# URN's
+URN_LOTO_APPLICATION
+# Ports
+PORT_SERVER
+CPF_MASTER_1
+# Api key
+API_KEY
+TOKEN_EXPIRATION
