@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { UserController } from '../api/controllers/UserController';
+import { LoginController } from '../api/controllers/LoginController';
 
 class LotoRoutes {
 	//- public
 	public serverRoute: string;
 	//- private
 	//-- Controllers
+	private loginController: LoginController;
 	private userController: UserController;
 
 	constructor(private router: Router) {
@@ -20,6 +22,7 @@ class LotoRoutes {
 
 	public initializeControllers(): void {
 		this.userController = new UserController();
+		this.loginController = new LoginController();
 	}
 
 	public initializeRoutes(): void {
@@ -28,7 +31,7 @@ class LotoRoutes {
 	}
 
 	private loginRoutes(): void {
-		// this.router.post(`${this.serverRoute}/login`, this.loginController.login);
+		this.router.post(`${this.serverRoute}/login`, this.loginController.login);
 	}
 
 	private userRoutes(): void {
