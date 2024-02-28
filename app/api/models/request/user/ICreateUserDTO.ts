@@ -1,3 +1,7 @@
-interface ICreateUserDTO {}
-
-export { ICreateUserDTO };
+export default interface ICreateUserDTO {
+	name: string;
+	cpf: string;
+	birthdate: Date;
+	whatsApp: string;
+	password: string;
+}
