@@ -1,10 +1,12 @@
 import { Router } from 'express';
+import { UserController } from '../api/controllers/UserController';
 
 class LotoRoutes {
 	//- public
 	public serverRoute: string;
 	//- private
 	//-- Controllers
+	private userController: UserController;
 
 	constructor(private router: Router) {
 		this.initializeVariables();
@@ -16,17 +18,23 @@ class LotoRoutes {
 		this.serverRoute = process.env.URN_LOTO_APPLICATION;
 	}
 
-	public initializeControllers(): void {}
+	public initializeControllers(): void {
+		this.userController = new UserController();
+	}
 
 	public initializeRoutes(): void {
+		this.loginRoutes();
+		this.userRoutes();
+	}
+
+	private loginRoutes(): void {
 		// this.router.post(`${this.serverRoute}/login`, this.loginController.login);
-		this.userRoutes(); //- Create user routes
 	}
 
 	private userRoutes(): void {
 		const prefix: string = "/user/";
+		this.router.post(`${this.serverRoute}${prefix}create`, this.userController.create);
 		// this.router.get(`${this.serverRoute}${prefix}detail/:userId`, this.userController.detail);
-		// this.router.post(`${this.serverRoute}${prefix}create`, this.userController.create);
 		// this.router.post(`${this.serverRoute}${prefix}code-activation`, this.userController.sendCodeToActivate);
 		// this.router.post(`${this.serverRoute}${prefix}activate`, this.userController.activate);
 		// this.router.post(

@@ -1,24 +1,25 @@
 import { HttpStatusCode } from "axios";
 import { NextFunction, Request, Response } from "express";
 
-import { ICreateUserDTO } from "../models/request/user/ICreateUserDTO";
+import ICreateUserDTO from "../models/request/user/ICreateUserDTO";
 import { IEditUserDTO } from "../models/request/user/IEditUserDTO";
 import { IDetailUserDTO } from "../models/response/user/IDetailUserDTO";
-import { CreateUserService } from "../services/create/CreateUserService";
+import CreateUserService from "../services/create/CreateUserService";
 import { DetailUserService } from "../services/detail/DetailUserService";
+import IUserCreatedDTO from "../models/response/user/IUserCreatedDTO";
 
 class UserController {
-	private _detailUserService: DetailUserService;
 	private _createUserService: CreateUserService;
+	private _detailUserService: DetailUserService;
 
 	public async create(req: Request, res: Response, next: NextFunction) {
 		try {
 			const payload = req.body as ICreateUserDTO;
 			UserController.prototype._createUserService = new CreateUserService();
-			const user: Document = await UserController.prototype._createUserService.execute(payload);
+			const user: IUserCreatedDTO = await UserController.prototype._createUserService.execute(payload);
 			return res.status(HttpStatusCode.Created).json({
 				code: HttpStatusCode.Created,
-				message: "",
+				message: "Usuário criado com sucesso",
 				payload: user,
 			});
 		} catch (error) {
