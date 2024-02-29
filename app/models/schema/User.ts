@@ -10,6 +10,9 @@ const UserSchema = new Schema({
 	//- Utils
 	active: { type: Boolean, required: true, default: false },
 	admin: { type: Boolean, required: true, default: false },
+	//- Dates
+	createdAt: { type: Date, required: true, default: Date.now },
+	updatedAt: { type: Date, required: false },
 });
 
 export const User = mongoose.model("User", UserSchema);

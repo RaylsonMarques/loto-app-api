@@ -1,10 +1,10 @@
 import { hash } from "bcryptjs";
 
-import CpfMask from "../../../helpers/CpfMask";
-import { Login } from "../../../models/schema/Login";
-import { User } from "../../../models/schema/User";
-import ICreateUserDTO from "../../models/request/user/ICreateUserDTO";
-import IUserCreatedDTO from "../../models/response/user/IUserCreatedDTO";
+import CpfMask from "../../../../helpers/CpfMask";
+import { Login } from "../../../../models/schema/Login";
+import { User } from "../../../../models/schema/User";
+import ICreateUserDTO from "../../../models/request/user/ICreateUserDTO";
+import IUserCreatedDTO from "../../../models/response/user/IUserCreatedDTO";
 
 export default class CreateUserService {
 	constructor() {}
