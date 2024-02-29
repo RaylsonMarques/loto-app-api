@@ -2,6 +2,7 @@ import { HttpStatusCode } from "axios";
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 import { env } from "process";
+import { User } from "../models/schema/User";
 
 interface IAuthenticatedPayload {
 	subject: string;
@@ -19,10 +20,9 @@ export function EnsureAuthenticated() {
 		const [, token] = authToken.split(" ");
 		try {
 			const { subject: userId } = verify(token, env.API_KEY) as IAuthenticatedPayload;
-			//- Instantiate repositories
 			//- Find user and settings
-			// const { id, settingsId, active, role }: Document = await User.findOne({ id: userId });
-			// req.user = { id, language, active, role };
+			const { id, active, admin, cpf } = await User.findOne({ id: userId });
+			req.user = { id, active, admin, cpf };
 		} catch (error) {
 			return res.status(HttpStatusCode.Unauthorized).json({ code: HttpStatusCode.Unauthorized, message: "Token inválido" });
 		}

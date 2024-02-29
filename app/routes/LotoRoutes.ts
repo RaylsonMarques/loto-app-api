@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { UserController } from '../api/controllers/UserController';
 import { LoginController } from '../api/controllers/LoginController';
+import { EnsureAuthenticated } from '../middlewares/EnsureAuthenticated';
+import { EnsureAdmin } from '../middlewares/EnsureAdmin';
+import GameController from '../api/controllers/GameController';
 
 class LotoRoutes {
 	//- public
@@ -9,6 +12,7 @@ class LotoRoutes {
 	//-- Controllers
 	private loginController: LoginController;
 	private userController: UserController;
+	private gameController: GameController;
 
 	constructor(private router: Router) {
 		this.initializeVariables();
@@ -23,11 +27,13 @@ class LotoRoutes {
 	public initializeControllers(): void {
 		this.userController = new UserController();
 		this.loginController = new LoginController();
+		this.gameController = new GameController();
 	}
 
 	public initializeRoutes(): void {
 		this.loginRoutes();
 		this.userRoutes();
+		this.gameRoutes();
 	}
 
 	private loginRoutes(): void {
@@ -47,6 +53,11 @@ class LotoRoutes {
 		// 	EnsureRole([0,1,2]),
 		// 	this.userController.deactivate
 		// );
+	}
+
+	private gameRoutes(): void {
+		const prefix: string = "/game/";
+		this.router.post(`${this.serverRoute}${prefix}create`, EnsureAuthenticated, EnsureAdmin, this.gameController.create);
 	}
 }
 
