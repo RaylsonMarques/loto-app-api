@@ -4,8 +4,8 @@ import { NextFunction, Request, Response } from "express";
 import ICreateUserDTO from "../models/request/user/ICreateUserDTO";
 import { IEditUserDTO } from "../models/request/user/IEditUserDTO";
 import { IDetailUserDTO } from "../models/response/user/IDetailUserDTO";
-import CreateUserService from "../services/create/CreateUserService";
-import { DetailUserService } from "../services/detail/DetailUserService";
+import CreateUserService from "../services/user/create/CreateUserService";
+import { DetailUserService } from "../services/user/detail/DetailUserService";
 import IUserCreatedDTO from "../models/response/user/IUserCreatedDTO";
 
 class UserController {
