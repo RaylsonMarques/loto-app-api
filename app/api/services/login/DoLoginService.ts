@@ -1,11 +1,12 @@
-import { compare } from 'bcryptjs';
-import { Login } from '../../../models/schema/Login';
-import IDoLoginDTO from '../../models/request/login/IDoLoginDTO';
-import { sign } from 'jsonwebtoken';
-import { User } from '../../../models/schema/User';
+import { compare } from "bcryptjs";
+import { sign } from "jsonwebtoken";
+
+import CpfMask from "../../../helpers/CpfMask";
+import { Login } from "../../../models/schema/Login";
+import { User } from "../../../models/schema/User";
+import IDoLoginDTO from "../../models/request/login/IDoLoginDTO";
 
 export default class DoLoginService {
-
 	constructor() {}
 
 	public async execute(payload: IDoLoginDTO): Promise<string> {
@@ -16,8 +17,9 @@ export default class DoLoginService {
 		}
 
 		//- Find any user with payload
-		const loginFounded = await Login.findOne({ cpf });
-		const user = await User.findOne({ cpf });
+		const cpfMaskHelper = new CpfMask(cpf);
+		const loginFounded = await Login.findOne({ cpf: cpfMaskHelper.getCpfWithoutMask() });
+		const user = await User.findOne({ cpf: cpfMaskHelper.getCpfWithoutMask() });
 
 		//- Validate
 		if (!loginFounded || !user) {
@@ -33,7 +35,7 @@ export default class DoLoginService {
 
 		const token: string = sign(
 			{
-				cpf: loginFounded.cpf
+				cpf: loginFounded.cpf,
 			},
 			process.env.API_KEY,
 			{ subject: user.id, expiresIn: process.env.TOKEN_EXPIRATION }
