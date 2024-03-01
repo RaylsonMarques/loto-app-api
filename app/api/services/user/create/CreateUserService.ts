@@ -14,6 +14,11 @@ export default class CreateUserService {
 		//- Validations
 		this.validate(name, cpf, birthdate, whatsApp);
 		const cpfMask: CpfMask = new CpfMask(cpf);
+		const userAlreadyExist = await User.findOne({ cpf: cpfMask.getCpfWithoutMask() });
+		if (userAlreadyExist) {
+			throw new Error("Já existe um usuário com este CPF cadastrado");
+		}
+
 		const userToSave = await User.create({
 			name,
 			cpf: cpfMask.getCpfWithoutMask(),
