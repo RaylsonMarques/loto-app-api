@@ -13,7 +13,6 @@ export default class CreateUserService {
 		const { name, cpf, birthdate, whatsApp, password } = payload;
 		//- Validations
 		this.validate(name, cpf, birthdate, whatsApp);
-
 		const cpfMask: CpfMask = new CpfMask(cpf);
 		const userToSave = await User.create({
 			name,
@@ -39,12 +38,18 @@ export default class CreateUserService {
 	private validate(name: string, cpf: string, birthdate: Date, whatsApp: string): void {
 		if (!name || name.length === 0 || name.trim() === "" || name.length < 3)
 			throw new Error("Nome inválido. Por favor, preencha corretamente e tente novamente.");
-		if (!this.validateCpf(cpf)) throw new Error("CPF inválido. Verifique e tente novamente");
+		if (this.validateCpf(cpf)) throw new Error("CPF inválido. Verifique e tente novamente");
 		if (!this.validateTelephone(whatsApp)) throw new Error("Numero de telefone inválido. Verifique e tente novamente");
 		if (!this.validateAge(birthdate)) throw new Error("É necessário ser maior de 18 anos para realizar o cadastro");
 	}
 
 	private validateCpf(cpf: string): boolean {
+		if (!cpf) {
+			return false;
+		}
+
+		const cpfMask: CpfMask = new CpfMask(cpf);
+		cpf = cpfMask.getCpfWithoutMask();
 		let soma: number;
 		let resto: number;
 		soma = 0;
@@ -82,15 +87,33 @@ export default class CreateUserService {
 	}
 
 	private validateTelephone(whatsApp: string): boolean {
-		const celular = whatsApp.replace("/[^0-9]/", "");
-		return celular.match(/^([14689][0-9]|2[12478]|3([1-5]|[7-8])|5([13-5])|7[193-7])9[0-9]{8}$/) ? true : false;
+		if (!whatsApp) {
+			return false;
+		}
+
+		const whatsAppSplitted: string[] = whatsApp.split(" ");
+		const ddd: string = whatsAppSplitted[0];
+		const telephone: string = whatsAppSplitted[1];
+
+		if (!this.validateTelephoneDDD(ddd)) {
+			throw new Error("DDD Inválido");
+		}
+
+		const telephoneSplitted: string[] = telephone.split("-");
+		const telephone1part: string = telephoneSplitted[0];
+		const telephone2part: string = telephoneSplitted[1];
+		if (telephone1part.length < 5 || telephone2part.length < 4) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private validateAge(birthdate: Date): boolean {
-		const differenceMS = Date.now() - birthdate.getTime();
-		const ageDate = new Date(differenceMS);
-		const age: number = Math.abs(ageDate.getUTCFullYear() - 1970);
-
+		const birthdateFormatted: Date = new Date(birthdate);
+		const actualYear: number = new Date().getFullYear();
+		const age = actualYear - birthdateFormatted.getFullYear();
+		console.log(age);
 		return age > 18;
 	}
 
@@ -103,5 +126,115 @@ export default class CreateUserService {
 	 */
 	private isAdmin(cpf: string): boolean {
 		return cpf === process.env.CPF_MASTER_2;
+	}
+
+	private validateTelephoneDDD(ddd: string): boolean {
+		/*
+			DDDs de cada estado
+			Centro-Oeste
+			– Distrito Federal (61)
+			– Goiás (62 e 64)
+			– Mato Grosso (65 e 66)
+			– Mato Grosso do Sul (67)
+			Nordeste
+			– Alagoas (82)
+			– Bahia (71, 73, 74, 75 e 77)
+			– Ceará (85 e 88)
+			– Maranhão (98 e 99)
+			– Paraíba (83)
+			– Pernambuco (81 e 87)
+			– Piauí (86 e 89)
+			– Rio Grande do Norte (84)
+			– Sergipe (79)
+			Norte
+			– Acre (68)
+			– Amapá (96)
+			– Amazonas (92 e 97)
+			– Pará (91, 93 e 94)
+			– Rondônia (69)
+			– Roraima (95)
+			– Tocantins (63)
+			Sudeste
+			– Espírito Santo (27 e 28)
+			– Minas Gerais (31, 32, 33, 34, 35, 37 e 38)
+			– Rio de Janeiro (21, 22 e 24)
+			– São Paulo (11, 12, 13, 14, 15, 16, 17, 18 e 19)
+			Sul
+			– Paraná (41, 42, 43, 44, 45 e 46)
+			– Rio Grande do Sul (51, 53, 54 e 55)
+			– Santa Catarina (47, 48 e 49)
+		*/
+
+		const validDDDs: string[] = [
+			"(61)",
+			"(62)",
+			"(64)",
+			"(65)",
+			"(66)",
+			"(67)",
+			"(82)",
+			"(71)",
+			"(73)",
+			"(74)",
+			"(75)",
+			"(77)",
+			"(85)",
+			"(88)",
+			"(98)",
+			"(99)",
+			"(83)",
+			"(81)",
+			"(87)",
+			"(86)",
+			"(89)",
+			"(84)",
+			"(79)",
+			"(68)",
+			"(96)",
+			"(92)",
+			"(97)",
+			"(91)",
+			"(93)",
+			"(94)",
+			"(69)",
+			"(95)",
+			"(63)",
+			"(27)",
+			"(28)",
+			"(31)",
+			"(32)",
+			"(33)",
+			"(34)",
+			"(35)",
+			"(37)",
+			"(38)",
+			"(21)",
+			"(22)",
+			"(24)",
+			"(11)",
+			"(12)",
+			"(13)",
+			"(14)",
+			"(15)",
+			"(16)",
+			"(17)",
+			"(18)",
+			"(19)",
+			"(41)",
+			"(42)",
+			"(43)",
+			"(44)",
+			"(45)",
+			"(46)",
+			"(51)",
+			"(53)",
+			"(54)",
+			"(55)",
+			"(47)",
+			"(48)",
+			"(49)",
+		];
+
+		return validDDDs.includes(ddd);
 	}
 }
