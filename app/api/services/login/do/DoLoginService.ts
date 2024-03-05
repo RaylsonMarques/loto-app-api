@@ -1,10 +1,10 @@
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 
-import CpfMask from "../../../helpers/CpfMask";
-import { Login } from "../../../models/schema/Login";
-import { User } from "../../../models/schema/User";
-import IDoLoginDTO from "../../models/request/login/IDoLoginDTO";
+import CpfMask from "../../../../helpers/CpfMask";
+import { Login } from "../../../../models/schema/Login";
+import { User } from "../../../../models/schema/User";
+import IDoLoginDTO from "../../../models/request/login/IDoLoginDTO";
 
 export default class DoLoginService {
 	constructor() {}

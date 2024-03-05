@@ -3,10 +3,9 @@ import { v4 as uuid } from "uuid";
 
 const UserSchema = new Schema({
 	id: { type: String, required: true, default: uuid() },
-	name: { type: String, required: true },
-	cpf: { type: String, required: true },
-	birthdate: { type: Date, required: true },
+	//- Contacts
 	whatsApp: { type: String, required: true },
+	email: { type: String, required: false },
 	//- Utils
 	active: { type: Boolean, required: true, default: false },
 	admin: { type: Boolean, required: true, default: false },

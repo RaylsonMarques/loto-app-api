@@ -2,7 +2,7 @@ import { HttpStatusCode } from "axios";
 import { NextFunction, Request, Response } from "express";
 
 import IDoLoginDTO from "../models/request/login/IDoLoginDTO";
-import LoginUserService from "../services/login/DoLoginService";
+import LoginUserService from "../services/login/do/DoLoginService";
 
 class LoginController {
 	private _loginUserService: LoginUserService;
