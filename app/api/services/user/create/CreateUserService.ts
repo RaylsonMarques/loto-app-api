@@ -1,42 +1,38 @@
-import { hash } from "bcryptjs";
-
 import CpfMask from "../../../../helpers/CpfMask";
-import { Login } from "../../../../models/schema/Login";
+import { People } from "../../../../models/schema/People";
 import { User } from "../../../../models/schema/User";
 import ICreateUserDTO from "../../../models/request/user/ICreateUserDTO";
 import IUserCreatedDTO from "../../../models/response/user/IUserCreatedDTO";
+import { CreateLoginService } from "../../login/create/CreateLoginService";
+import CreatePeopleService from "../../people/create/CreatePeopleService";
 
 export default class CreateUserService {
 	constructor() {}
 
 	public async execute(payload: ICreateUserDTO): Promise<IUserCreatedDTO> {
-		const { name, cpf, birthdate, whatsApp, password } = payload;
+		const { name, cpf, birthdate, whatsApp } = payload;
 		//- Validations
 		this.validate(name, cpf, birthdate, whatsApp);
 		const cpfMask: CpfMask = new CpfMask(cpf);
-		const userAlreadyExist = await User.findOne({ cpf: cpfMask.getCpfWithoutMask() });
+		const userAlreadyExist = await People.findOne({ cpf: cpfMask.getCpfWithoutMask() });
 		if (userAlreadyExist) {
-			throw new Error("Já existe um usuário com este CPF cadastrado");
+			throw new Error("Já existe um usuário cadastrado com este CPF");
 		}
-
+		//- Create user
 		const userToSave = await User.create({
-			name,
-			cpf: cpfMask.getCpfWithoutMask(),
-			birthdate,
 			whatsApp,
+			email: null,
+			active: false,
 			admin: this.isAdmin(cpfMask.getCpfWithoutMask()),
 		});
 		const userSaved = await userToSave.save();
-
-		//- Encript password
-		const passwordEncrypted = await hash(password, 8);
-		const loginToSave = await Login.create({
-			cpf: userSaved.cpf,
-			password: passwordEncrypted,
-		});
-		await loginToSave.save();
-
-		const userCreated: IUserCreatedDTO = { name: userSaved.name, cpf: cpfMask.getCpfWithMask() };
+		//- Create people
+		const createPeopleService = new CreatePeopleService(userSaved.id);
+		const peopleSaved = await createPeopleService.execute(name, cpf, birthdate);
+		//- Create login
+		const createLoginService = new CreateLoginService();
+		await createLoginService.execute(peopleSaved.cpf, peopleSaved.initials);
+		const userCreated: IUserCreatedDTO = { name: peopleSaved.name, cpf: cpfMask.getCpfWithMask() };
 		return userCreated;
 	}
 
@@ -130,46 +126,10 @@ export default class CreateUserService {
 	 * @returns {boolean}
 	 */
 	private isAdmin(cpf: string): boolean {
-		return cpf === process.env.CPF_MASTER_2;
+		return cpf === process.env.CPF_MASTER_1 || cpf === process.env.CPF_MASTER_2;
 	}
 
 	private validateTelephoneDDD(ddd: string): boolean {
-		/*
-			DDDs de cada estado
-			Centro-Oeste
-			– Distrito Federal (61)
-			– Goiás (62 e 64)
-			– Mato Grosso (65 e 66)
-			– Mato Grosso do Sul (67)
-			Nordeste
-			– Alagoas (82)
-			– Bahia (71, 73, 74, 75 e 77)
-			– Ceará (85 e 88)
-			– Maranhão (98 e 99)
-			– Paraíba (83)
-			– Pernambuco (81 e 87)
-			– Piauí (86 e 89)
-			– Rio Grande do Norte (84)
-			– Sergipe (79)
-			Norte
-			– Acre (68)
-			– Amapá (96)
-			– Amazonas (92 e 97)
-			– Pará (91, 93 e 94)
-			– Rondônia (69)
-			– Roraima (95)
-			– Tocantins (63)
-			Sudeste
-			– Espírito Santo (27 e 28)
-			– Minas Gerais (31, 32, 33, 34, 35, 37 e 38)
-			– Rio de Janeiro (21, 22 e 24)
-			– São Paulo (11, 12, 13, 14, 15, 16, 17, 18 e 19)
-			Sul
-			– Paraná (41, 42, 43, 44, 45 e 46)
-			– Rio Grande do Sul (51, 53, 54 e 55)
-			– Santa Catarina (47, 48 e 49)
-		*/
-
 		const validDDDs: string[] = [
 			"(61)",
 			"(62)",
@@ -243,3 +203,39 @@ export default class CreateUserService {
 		return validDDDs.includes(ddd);
 	}
 }
+
+/*
+DDDs de cada estado
+Centro-Oeste
+– Distrito Federal (61)
+– Goiás (62 e 64)
+– Mato Grosso (65 e 66)
+– Mato Grosso do Sul (67)
+Nordeste
+– Alagoas (82)
+– Bahia (71, 73, 74, 75 e 77)
+– Ceará (85 e 88)
+– Maranhão (98 e 99)
+– Paraíba (83)
+– Pernambuco (81 e 87)
+– Piauí (86 e 89)
+– Rio Grande do Norte (84)
+– Sergipe (79)
+Norte
+– Acre (68)
+– Amapá (96)
+– Amazonas (92 e 97)
+– Pará (91, 93 e 94)
+– Rondônia (69)
+– Roraima (95)
+– Tocantins (63)
+Sudeste
+– Espírito Santo (27 e 28)
+– Minas Gerais (31, 32, 33, 34, 35, 37 e 38)
+– Rio de Janeiro (21, 22 e 24)
+– São Paulo (11, 12, 13, 14, 15, 16, 17, 18 e 19)
+Sul
+– Paraná (41, 42, 43, 44, 45 e 46)
+– Rio Grande do Sul (51, 53, 54 e 55)
+– Santa Catarina (47, 48 e 49)
+*/

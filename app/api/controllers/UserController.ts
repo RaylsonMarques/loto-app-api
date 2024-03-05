@@ -36,7 +36,7 @@ class UserController {
 		}
 	}
 
-	public async recoverAccount(req: Request, res: Response, next: NextFunction) {}
+	public async activate(req: Request, res: Response, next: NextFunction) {}
 
 	public async detail(req: Request, res: Response, next: NextFunction) {
 		try {
