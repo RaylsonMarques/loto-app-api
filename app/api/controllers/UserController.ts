@@ -1,16 +1,19 @@
-import { HttpStatusCode } from "axios";
-import { NextFunction, Request, Response } from "express";
+import { HttpStatusCode } from 'axios';
+import { NextFunction, Request, Response } from 'express';
 
-import ICreateUserDTO from "../models/request/user/ICreateUserDTO";
-import { IEditUserDTO } from "../models/request/user/IEditUserDTO";
-import { IDetailUserDTO } from "../models/response/user/IDetailUserDTO";
-import CreateUserService from "../services/user/create/CreateUserService";
-import { DetailUserService } from "../services/user/detail/DetailUserService";
-import IUserCreatedDTO from "../models/response/user/IUserCreatedDTO";
+import { IActivateUserDTO } from '../models/request/user/IActivateUserDTO';
+import ICreateUserDTO from '../models/request/user/ICreateUserDTO';
+import { IEditUserDTO } from '../models/request/user/IEditUserDTO';
+import { IDetailUserDTO } from '../models/response/user/IDetailUserDTO';
+import IUserCreatedDTO from '../models/response/user/IUserCreatedDTO';
+import ActivateUserService from '../services/user/activate/ActivateUserService';
+import CreateUserService from '../services/user/create/CreateUserService';
+import { DetailUserService } from '../services/user/detail/DetailUserService';
 
 class UserController {
 	private _createUserService: CreateUserService;
 	private _detailUserService: DetailUserService;
+	private _activateUserService: ActivateUserService;
 
 	public async create(req: Request, res: Response, next: NextFunction) {
 		try {
@@ -36,7 +39,35 @@ class UserController {
 		}
 	}
 
-	public async activate(req: Request, res: Response, next: NextFunction) {}
+	public async userActive(req: Request, res: Response, next: NextFunction) {
+		try {
+			const payload: any = req.body;
+			UserController.prototype._detailUserService = new DetailUserService();
+			const userIsActive: boolean = await UserController.prototype._detailUserService.userIsActive(payload.cpf);
+			return res.status(HttpStatusCode.Ok).json({
+				code: HttpStatusCode.Ok,
+				message: userIsActive ? "" : "O usuário ainda não está ativo. Por favor ative e faça o login novamente.",
+				payload: userIsActive
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	public async activate(req: Request, res: Response, next: NextFunction) {
+		try {
+			const payload: IActivateUserDTO = req.body;
+			UserController.prototype._activateUserService = new ActivateUserService();
+			const userActivated: IUserCreatedDTO = await UserController.prototype._activateUserService.execute(payload);
+			return res.status(HttpStatusCode.Ok).json({
+				code: HttpStatusCode.Ok,
+				message: "Usuário ativado com sucesso",
+				payload: userActivated
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
 
 	public async detail(req: Request, res: Response, next: NextFunction) {
 		try {
