@@ -1,6 +1,7 @@
 interface IActivateUserDTO {
-	userId: string;
-	code: string;
+	cpf: string;
+	temporaryPassword: string;
+	password: string;
 }
 
 export { IActivateUserDTO };

@@ -52,10 +52,11 @@ class LotoRoutes {
 
 	private userRoutes(): void {
 		const prefix: string = "/user/";
-		this.router.post(`${this.serverRoute}${prefix}create`, this.userController.create);
+		this.router.post(`${this.serverRoute}${prefix}create`, this.userController.create); //- Cria um usuario
+		this.router.post(`${this.serverRoute}${prefix}user-active`, this.userController.userActive); //- Verifica se o usuário está ativo
+		this.router.post(`${this.serverRoute}${prefix}activate`, this.userController.activate); //- Ativa o usuário
 		// this.router.get(`${this.serverRoute}${prefix}detail/:userId`, this.userController.detail);
 		// this.router.post(`${this.serverRoute}${prefix}code-activation`, this.userController.sendCodeToActivate);
-		// this.router.post(`${this.serverRoute}${prefix}activate`, this.userController.activate);
 		// this.router.post(
 		// 	`${this.serverRoute}${prefix}deactivate`,
 		// 	EnsureAuthenticated,
