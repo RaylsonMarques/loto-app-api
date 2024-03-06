@@ -3,6 +3,7 @@ import { People } from "../../../../models/schema/People";
 import { User } from "../../../../models/schema/User";
 import ICreateUserDTO from "../../../models/request/user/ICreateUserDTO";
 import IUserCreatedDTO from "../../../models/response/user/IUserCreatedDTO";
+import CreateAccountService from "../../account/create/CreateAccountService";
 import { CreateLoginService } from "../../login/create/CreateLoginService";
 import CreatePeopleService from "../../people/create/CreatePeopleService";
 
@@ -29,6 +30,9 @@ export default class CreateUserService {
 		//- Create people
 		const createPeopleService = new CreatePeopleService(userSaved.id);
 		const peopleSaved = await createPeopleService.execute(name, cpf, birthdate);
+		//- Create an account
+		const createAccountService: CreateAccountService = new CreateAccountService();
+		await createAccountService.execute(userSaved.id);
 		//- Create login
 		const createLoginService = new CreateLoginService();
 		await createLoginService.execute(peopleSaved.cpf, peopleSaved.initials);
