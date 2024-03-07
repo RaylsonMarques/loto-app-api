@@ -3,6 +3,7 @@ import { sign } from "jsonwebtoken";
 
 import CpfMask from "../../../../helpers/CpfMask";
 import { Login } from "../../../../models/schema/Login";
+import { People } from "../../../../models/schema/People";
 import { User } from "../../../../models/schema/User";
 import IDoLoginDTO from "../../../models/request/login/IDoLoginDTO";
 
@@ -19,10 +20,11 @@ export default class DoLoginService {
 		//- Find any user with payload
 		const cpfMaskHelper = new CpfMask(cpf);
 		const loginFounded = await Login.findOne({ cpf: cpfMaskHelper.getCpfWithoutMask() });
-		const user = await User.findOne({ cpf: cpfMaskHelper.getCpfWithoutMask() });
+		const peopleFounded = await People.findOne({ cpf: cpfMaskHelper.getCpfWithoutMask() });
+		const user = await User.findOne({ id: peopleFounded.userId });
 
 		//- Validate
-		if (!loginFounded || !user) {
+		if (!loginFounded || !peopleFounded) {
 			//- Throw an exception with status 401 unauthorized
 			throw new Error("Usuário ou senha incorretos");
 		}
