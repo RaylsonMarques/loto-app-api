@@ -1,12 +1,12 @@
 import { HttpStatusCode } from "axios";
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import { env } from "process";
-import { User } from "../models/schema/User";
+
 import { People } from "../models/schema/People";
+import { User } from "../models/schema/User";
 
 interface IAuthenticatedPayload {
-	subject: string;
+	sub: string;
 }
 
 export function EnsureAuthenticated() {
@@ -20,11 +20,11 @@ export function EnsureAuthenticated() {
 		//- Validate if token is valid
 		const [, token] = authToken.split(" ");
 		try {
-			const { subject: userId } = verify(token, env.API_KEY) as IAuthenticatedPayload;
+			const { sub } = verify(token, process.env.API_KEY) as IAuthenticatedPayload;
 			//- Find user and settings
-			const { cpf } = await People.findOne({ userId });
-			const { id, active, admin } = await User.findOne({ id: userId });
-			req.user = { id, active, admin, cpf };
+			const peopleFounded = await People.findOne({ userId: sub });
+			const userFounded = await User.findOne({ id: sub });
+			req.user = { id: userFounded.id, active: userFounded.active, admin: userFounded.admin, cpf: peopleFounded.cpf };
 		} catch (error) {
 			return res.status(HttpStatusCode.Unauthorized).json({ code: HttpStatusCode.Unauthorized, message: "Token inválido" });
 		}

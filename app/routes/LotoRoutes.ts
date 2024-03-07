@@ -41,9 +41,9 @@ class LotoRoutes {
 	}
 
 	private controlRoutes(): void {
-		const prefix: string = "control";
-		this.router.get(`${this.serverRoute}${prefix}authenticated`, EnsureAuthenticated, this.controlController.verifyAuthenticated);
-		this.router.get(`${this.serverRoute}${prefix}isAdmin`, EnsureAuthenticated, EnsureAdmin, this.controlController.verifyAdmin);
+		const prefix: string = "/control/";
+		this.router.get(`${this.serverRoute}${prefix}authenticated`, EnsureAuthenticated(), this.controlController.verifyAuthenticated);
+		this.router.get(`${this.serverRoute}${prefix}isAdmin`, EnsureAuthenticated(), EnsureAdmin(), this.controlController.verifyAdmin);
 	}
 
 	private loginRoutes(): void {
